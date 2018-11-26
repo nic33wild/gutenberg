@@ -552,6 +552,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/blocks-fixtures",
+		"slug": "packages-blocks-fixtures",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blocks-fixtures/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/blocks",
 		"slug": "packages-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blocks/README.md",

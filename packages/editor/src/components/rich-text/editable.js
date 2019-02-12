@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -9,11 +8,12 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { toElement, applySelection } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { diffAriaProps, pickAriaProps } from './aria';
+import { pickAriaProps } from './aria';
 
 /**
  * Browser dependencies
@@ -98,43 +98,6 @@ export default class Editable extends Component {
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 	}
 
-	// We must prevent rerenders because the browser will modify the DOM. React
-	// will rerender the DOM fine, but we're losing selection and it would be
-	// more expensive to do so as it would just set the inner HTML through
-	// `dangerouslySetInnerHTML`. Instead RichText does it's own diffing and
-	// selection setting.
-	//
-	// Because we never update the component, we have to look through props and
-	// update the attributes on the wrapper nodes here. `componentDidUpdate`
-	// will never be called.
-	shouldComponentUpdate( nextProps ) {
-		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
-
-		if ( ! isEqual( this.props.style, nextProps.style ) ) {
-			this.editorNode.setAttribute( 'style', '' );
-			Object.assign( this.editorNode.style, nextProps.style );
-		}
-
-		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, CLASS_NAME );
-		}
-
-		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
-		removedKeys.forEach( ( key ) =>
-			this.editorNode.removeAttribute( key ) );
-		updatedKeys.forEach( ( key ) =>
-			this.editorNode.setAttribute( key, nextProps[ key ] ) );
-
-		return false;
-	}
-
-	configureIsPlaceholderVisible( isPlaceholderVisible ) {
-		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
-		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
-			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
-		}
-	}
-
 	bindEditorNode( editorNode ) {
 		this.editorNode = editorNode;
 
@@ -153,13 +116,18 @@ export default class Editable extends Component {
 		}
 	}
 
+	componentDidUpdate() {
+		if ( this.selection && this.selection.startPath.length > 0 ) {
+			applySelection( this.selection, this.editorNode );
+		}
+	}
+
 	render() {
 		const ariaProps = pickAriaProps( this.props );
 		const {
 			tagName = 'div',
 			style,
-			record,
-			valueToEditableHTML,
+			value,
 			className,
 			isPlaceholderVisible,
 			onPaste,
@@ -173,6 +141,14 @@ export default class Editable extends Component {
 		ariaProps.role = 'textbox';
 		ariaProps[ 'aria-multiline' ] = true;
 
+		const { element, selection } = toElement( {
+			value,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+		} );
+
+		this.selection = selection;
+
 		return createElement( tagName, {
 			...ariaProps,
 			className: classnames( className, CLASS_NAME ),
@@ -181,13 +157,12 @@ export default class Editable extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
 			onFocus,
 			onBlur,
 			onKeyDown,
 			onCompositionEnd,
-		} );
+		}, element );
 	}
 }

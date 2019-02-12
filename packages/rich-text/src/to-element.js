@@ -131,7 +131,9 @@ function remove( object ) {
 	return object;
 }
 
-function createElementHTML( { type, attributes, object, children } ) {
+function createElementHTML( { type, attributes = {}, object, children }, index ) {
+	attributes.key = index;
+
 	if ( object ) {
 		return createElement( type, attributes );
 	}
@@ -140,7 +142,7 @@ function createElementHTML( { type, attributes, object, children } ) {
 }
 
 function createChildrenHTML( children = [] ) {
-	return children.map( ( child ) => {
-		return child.text === undefined ? createElementHTML( child ) : escapeHTML( child.text );
+	return children.map( ( child, index ) => {
+		return child.text === undefined ? createElementHTML( child, index ) : escapeHTML( child.text );
 	} );
 }

@@ -2,9 +2,10 @@
  * Internal dependencies
  */
 
-import { toDom } from '../to-dom';
+import { toElement } from '../to-element';
 import { spec } from './helpers';
 
+// Keep name and file intact for now to see diff.
 describe( 'recordToDom', () => {
 	beforeAll( () => {
 		// Initialize the rich-text store.
@@ -20,12 +21,12 @@ describe( 'recordToDom', () => {
 		endPath,
 	} ) => {
 		it( description, () => {
-			const { body, selection } = toDom( {
+			const { element, selection } = toElement( {
 				value: record,
 				multilineTag,
 				multilineWrapperTags,
 			} );
-			expect( body ).toMatchSnapshot();
+			expect( element ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );
 		} );
 	} );

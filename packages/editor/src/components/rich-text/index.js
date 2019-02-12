@@ -5,11 +5,9 @@ import classnames from 'classnames';
 import {
 	find,
 	isNil,
-	// isEqual,
 	omit,
 	pickBy,
 	get,
-	// isPlainObject,
 } from 'lodash';
 import memize from 'memize';
 
@@ -407,7 +405,6 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end, selectedFormat } );
-			// this.applyRecord( { ...value, selectedFormat } );
 
 			delete this.formatPlaceholder;
 		}
@@ -675,7 +672,6 @@ export class RichText extends Component {
 		}
 
 		if ( newSelectedFormat !== selectedFormat ) {
-			// this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );
 			this.setState( { selectedFormat: newSelectedFormat } );
 			return;
 		}
@@ -683,12 +679,6 @@ export class RichText extends Component {
 		const newPos = value.start + ( isReverse ? -1 : 1 );
 
 		this.setState( { start: newPos, end: newPos } );
-		// this.applyRecord( {
-		// 	...value,
-		// 	start: newPos,
-		// 	end: newPos,
-		// 	selectedFormat: isReverse ? formatsBefore.length : formatsAfter.length,
-		// } );
 	}
 
 	/**
@@ -737,67 +727,6 @@ export class RichText extends Component {
 
 		this.onSplit( before, after, ...blocks );
 	}
-
-	// componentDidUpdate( prevProps ) {
-	// 	const { tagName, value, isSelected } = this.props;
-
-	// 	if (
-	// 		tagName === prevProps.tagName &&
-	// 		value !== prevProps.value &&
-	// 		value !== this.savedContent
-	// 	) {
-	// 		// Handle deprecated `children` and `node` sources.
-	// 		// The old way of passing a value with the `node` matcher required
-	// 		// the value to be mapped first, creating a new array each time, so
-	// 		// a shallow check wouldn't work. We need to check deep equality.
-	// 		// This is only executed for a deprecated API and will eventually be
-	// 		// removed.
-	// 		if ( Array.isArray( value ) && isEqual( value, this.savedContent ) ) {
-	// 			return;
-	// 		}
-
-	// 		const record = this.formatToValue( value );
-
-	// 		if ( isSelected ) {
-	// 			const prevRecord = this.formatToValue( prevProps.value );
-	// 			const length = getTextContent( prevRecord ).length;
-	// 			record.start = length;
-	// 			record.end = length;
-	// 		}
-
-	// 		this.applyRecord( record );
-	// 		this.savedContent = value;
-	// 	}
-
-	// 	// If any format props update, reapply value.
-	// 	const shouldReapply = Object.keys( this.props ).some( ( name ) => {
-	// 		if ( name.indexOf( 'format_' ) !== 0 ) {
-	// 			return false;
-	// 		}
-
-	// 		// Allow primitives and arrays:
-	// 		if ( ! isPlainObject( this.props[ name ] ) ) {
-	// 			return this.props[ name ] !== prevProps[ name ];
-	// 		}
-
-	// 		return Object.keys( this.props[ name ] ).some( ( subName ) => {
-	// 			return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
-	// 		} );
-	// 	} );
-
-	// 	if ( shouldReapply ) {
-	// 		const record = this.formatToValue( value );
-
-	// 		// Maintain the previous selection if the instance is currently
-	// 		// selected.
-	// 		if ( isSelected ) {
-	// 			record.start = this.state.start;
-	// 			record.end = this.state.end;
-	// 		}
-
-	// 		this.applyRecord( record );
-	// 	}
-	// }
 
 	/**
 	 * Get props that are provided by formats to modify RichText.
